@@ -1,0 +1,32 @@
+# Git / Version Control
+.git
+.gitignore
+
+# Virtual Environments
+.venv
+venv/
+ENV/
+
+# Python Cache & Compiled Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local Downloads & Media Outputs
+downloads/
+
+# Environment Variables & Secrets
+.env
+*.pem
+
+# IDE & OS Metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker Files (optional)
+Dockerfile
+docker-compose.yml

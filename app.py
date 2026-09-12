@@ -38,10 +38,16 @@ def get_base_ydl_opts():
         "retries": 10,
         "http_headers": {
             "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/125.0.0.0 Safari/537.36"
+                "com.google.android.youtube/19.09.37 (Linux; U; Android 11; "
+                "en_US; Pixel 5 Build/RD2A.211001.002)"
             ),
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        # Bypasses web bot checks by requesting YouTube internal Mobile APIs
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "ios"]
+            }
         },
     }
     ffmpeg_path = shutil.which("ffmpeg")
@@ -159,10 +165,11 @@ def download_single(url, mode, quality, job_id):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
     except Exception:
-        # Retry once with a looser, more compatible format spec before giving up
+        # Fallback to web/mweb clients if android client fails on a specific format
         fallback_opts = dict(ydl_opts)
         fallback_opts["format"] = "best" if mode == "video" else "bestaudio/best"
         fallback_opts.pop("format_sort", None)
+        fallback_opts["extractor_args"] = {"youtube": {"player_client": ["mweb", "web"]}}
         with yt_dlp.YoutubeDL(fallback_opts) as ydl:
             info = ydl.extract_info(url, download=True)
 
