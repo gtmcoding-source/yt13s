@@ -34,22 +34,29 @@ def get_base_ydl_opts():
     opts = {
         "quiet": True,
         "nocheckcertificate": True,
-        "socket_timeout": 20,
+        "socket_timeout": 30,
         "retries": 10,
         "http_headers": {
             "User-Agent": (
-                "com.google.android.youtube/19.09.37 (Linux; U; Android 11; "
-                "en_US; Pixel 5 Build/RD2A.211001.002)"
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/125.0.0.0 Safari/537.36"
             ),
             "Accept-Language": "en-US,en;q=0.9",
         },
-        # Bypasses web bot checks by requesting YouTube internal Mobile APIs
+        # Bypasses YouTube's bot wall by stripping out flagged android_sdkless endpoints
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "ios"]
+                "player_client": ["default", "-android_sdkless"]
             }
         },
     }
+
+    # Optional Proxy support via environment variable on Render
+    proxy_url = os.environ.get("PROXY_URL", "").strip()
+    if proxy_url:
+        opts["proxy"] = proxy_url
+
     ffmpeg_path = shutil.which("ffmpeg")
     if ffmpeg_path:
         opts["ffmpeg_location"] = os.path.dirname(ffmpeg_path)
@@ -165,11 +172,15 @@ def download_single(url, mode, quality, job_id):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
     except Exception:
-        # Fallback to web/mweb clients if android client fails on a specific format
+        # Secondary fallback client options if default client fails
         fallback_opts = dict(ydl_opts)
         fallback_opts["format"] = "best" if mode == "video" else "bestaudio/best"
         fallback_opts.pop("format_sort", None)
-        fallback_opts["extractor_args"] = {"youtube": {"player_client": ["mweb", "web"]}}
+        fallback_opts["extractor_args"] = {
+            "youtube": {
+                "player_client": ["tv_embedded", "mweb"]
+            }
+        }
         with yt_dlp.YoutubeDL(fallback_opts) as ydl:
             info = ydl.extract_info(url, download=True)
 
