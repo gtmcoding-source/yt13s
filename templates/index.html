@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT-DLP - YouTube Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        header {
+            border-bottom: 1px solid #eaeaea;
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 28px;
+            font-weight: 800;
+            color: #ff0000;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background-color: #ff0000;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 50px 20px 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 34px;
+            font-weight: 700;
+            color: #222222;
+            margin-bottom: 12px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 35px;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+        }
+
+        .url-input {
+            width: 65%;
+            padding: 18px 24px;
+            font-size: 16px;
+            border: 2px solid #ff0000;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            outline: none;
+            color: #333;
+        }
+
+        .url-input::placeholder {
+            color: #aaa;
+        }
+
+        .btn-convert {
+            width: 35%;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-convert:hover:not(:disabled) {
+            background-color: #e60000;
+        }
+
+        .btn-convert:disabled {
+            background-color: #f5a3a3;
+            cursor: not-allowed;
+        }
+
+        .mode-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 18px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .mode-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        #status {
+            display: none;
+            margin-top: 25px;
+            font-size: 16px;
+            color: #ff0000;
+            font-weight: 600;
+        }
+
+        #error-msg {
+            display: none;
+            margin-top: 20px;
+            color: #d9534f;
+            font-weight: 600;
+        }
+
+        #result-section {
+            display: none;
+            margin-top: 35px;
+            padding: 25px;
+            border: 1px solid #eaeaea;
+            border-radius: 12px;
+            background: #fafafa;
+            text-align: left;
+        }
+
+        .result-content {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 180px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .info-box {
+            flex: 1;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        .done-note {
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .manual-link {
+            font-size: 14px;
+            color: #555;
+            margin-top: 6px;
+        }
+
+        .manual-link a {
+            color: #ff0000;
+            font-weight: 600;
+        }
+
+        .info-section {
+            max-width: 900px;
+            margin: 60px auto 40px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .info-section h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        .info-section p {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 600px) {
+            .search-box {
+                flex-direction: column;
+            }
+            .url-input {
+                width: 100%;
+                border-right: 2px solid #ff0000;
+                border-radius: 12px 12px 0 0;
+            }
+            .btn-convert {
+                width: 100%;
+                padding: 15px;
+                border-radius: 0 0 12px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">
+            <div class="logo-icon">↓</div>
+            YT-DLP
+        </a>
+    </header>
+
+    <div class="hero-section">
+        <h1 class="hero-title">YT-DLP - YouTube Video Downloader</h1>
+        <p class="hero-subtitle">Paste a link, hit Convert — your file lands straight in your Downloads folder.</p>
+
+        <form id="fetch-form" onsubmit="handleConvert(event)">
+            <div class="search-box">
+                <input type="text" id="video-url" class="url-input" placeholder="Paste YouTube link or search term" required>
+                <button type="submit" class="btn-convert" id="convert-btn">Convert</button>
+            </div>
+            <div class="mode-row">
+                <label><input type="radio" name="mode" value="video" checked> Video (MP4, up to 1080p)</label>
+                <label><input type="radio" name="mode" value="audio"> Audio only (MP3)</label>
+            </div>
+        </form>
+
+        <div id="status"></div>
+        <div id="error-msg"></div>
+
+        <div id="result-section">
+            <div class="result-content">
+                <img id="thumb-img" class="thumbnail" src="" alt="Thumbnail">
+                <div class="info-box">
+                    <div id="video-title" class="video-title"></div>
+                    <div class="done-note">✅ Downloaded — your browser download should start automatically.</div>
+                    <div class="manual-link">If it didn't start, <a id="manual-link" href="#">click here to download</a>.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>YT-DLP - Online YouTube Video Downloader</h2>
+        <p><strong>YT-DLP</strong> is a YouTube video downloader that converts and merges video directly on the server, then delivers the finished file straight to your device.</p>
+    </div>
+
+    <script>
+        async function handleConvert(e) {
+            e.preventDefault();
+
+            const urlInput = document.getElementById('video-url').value;
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const status = document.getElementById('status');
+            const errorMsg = document.getElementById('error-msg');
+            const resultSection = document.getElementById('result-section');
+            const btn = document.getElementById('convert-btn');
+
+            btn.disabled = true;
+            errorMsg.style.display = 'none';
+            resultSection.style.display = 'none';
+            status.style.display = 'block';
+            status.innerText = mode === 'audio'
+                ? '⚡ Fetching and extracting audio... this can take a moment...'
+                : '⚡ Downloading and merging video... this can take a moment...';
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ url: urlInput, mode })
+                });
+
+                const data = await response.json();
+                status.style.display = 'none';
+                btn.disabled = false;
+
+                if (data.error) {
+                    errorMsg.innerText = data.error;
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('video-title').innerText = data.title;
+                document.getElementById('thumb-img').src = data.thumbnail;
+
+                const fileUrl = `/files/${encodeURIComponent(data.filename)}`;
+                document.getElementById('manual-link').href = fileUrl;
+                resultSection.style.display = 'block';
+
+                // Automatically trigger the browser download
+                window.location.href = fileUrl;
+            } catch (err) {
+                status.style.display = 'none';
+                btn.disabled = false;
+                errorMsg.innerText = "Error connecting to backend server.";
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
